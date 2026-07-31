@@ -379,46 +379,36 @@
     </p>
 
 </footer>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+
 <script>
-    function calculateCategoryTotal(storageKey) {
-        const savedData = localStorage.getItem(storageKey);
+async function updateImpactDashboard() {
+    try {
+        await signInVisitor();
 
-        if (!savedData) {
-            return 0;
-        }
+        const snapshot = await db
+            .collection("cleanupLogs")
+            .get();
 
-        try {
-            const parsedData = JSON.parse(savedData);
-            let categoryTotal = 0;
+        let bottleTotal = 0;
+        let wrapperTotal = 0;
+        let canTotal = 0;
 
-            Object.values(parsedData).forEach(function (entry) {
-                if (typeof entry === "number") {
-                    categoryTotal += entry;
-                } else if (
-                    entry &&
-                    typeof entry === "object" &&
-                    typeof entry.total === "number"
-                ) {
-                    categoryTotal += entry.total;
-                }
-            });
+        snapshot.forEach((documentSnapshot) => {
+            const entry = documentSnapshot.data();
+            const quantity = Number(entry.quantity) || 0;
 
-            return categoryTotal;
-        } catch (error) {
-            console.error(
-                "Unable to read saved GreenPath data:",
-                storageKey,
-                error
-            );
-
-            return 0;
-        }
-    }
-
-    function updateImpactDashboard() {
-        const bottleTotal = calculateCategoryTotal("bottles");
-        const wrapperTotal = calculateCategoryTotal("wrappers");
-        const canTotal = calculateCategoryTotal("cans");
+            if (entry.category === "bottle") {
+                bottleTotal += quantity;
+            } else if (entry.category === "wrapper") {
+                wrapperTotal += quantity;
+            } else if (entry.category === "can") {
+                canTotal += quantity;
+            }
+        });
 
         const allItemsTotal =
             bottleTotal +
@@ -436,24 +426,32 @@
 
         document.getElementById("allItemsTotal").textContent =
             allItemsTotal.toLocaleString();
-		const communityGoal = 500;
 
-const goalPercentage = Math.min(
-    Math.round((allItemsTotal / communityGoal) * 100),
-    100
-);
+        const communityGoal = 500;
 
-document.getElementById("goalCurrent").textContent =
-    allItemsTotal.toLocaleString();
+        const goalPercentage = Math.min(
+            Math.round((allItemsTotal / communityGoal) * 100),
+            100
+        );
 
-document.getElementById("goalProgress").style.width =
-    goalPercentage + "%";
+        document.getElementById("goalCurrent").textContent =
+            allItemsTotal.toLocaleString();
 
-document.getElementById("goalPercent").textContent =
-    goalPercentage + "% complete";
+        document.getElementById("goalProgress").style.width =
+            goalPercentage + "%";
+
+        document.getElementById("goalPercent").textContent =
+            goalPercentage + "% complete";
+
+    } catch (error) {
+        console.error(
+            "Unable to load GreenPath dashboard:",
+            error
+        );
     }
+}
 
-    updateImpactDashboard();
+updateImpactDashboard();
 </script>
 </body>
 </html>
