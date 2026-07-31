@@ -77,114 +77,57 @@
 
 </main>
 
+
 <script>
-function saveData() {
-    const nameInput = document.getElementById("name");
-    const wrapperInput = document.getElementById("wrappers");
-
-    const name = nameInput.value.trim();
-    const wrappers = Number(wrapperInput.value);
-
-    if (name === "") {
-        alert("Please enter your name.");
-        return;
-    }
-
-    if (!Number.isInteger(wrappers) || wrappers <= 0) {
-        alert("Please enter a whole number greater than zero.");
-        return;
-    }
-
-    const data =
-        JSON.parse(localStorage.getItem("wrappers")) || {};
-
-    const nameKey = name.toLowerCase();
-
-    if (data[nameKey]) {
-        if (typeof data[nameKey] === "number") {
-            data[nameKey] = {
-                displayName: name,
-                total: data[nameKey] + wrappers
-            };
-        } else {
-            data[nameKey].total += wrappers;
-        }
-    } else {
-        data[nameKey] = {
-            displayName: name,
-            total: wrappers
-        };
-    }
-
-    localStorage.setItem(
-        "wrappers",
-        JSON.stringify(data)
-    );
-
-    document.getElementById("message").textContent =
-        "Great job, " + name + "! You added " +
-        wrappers + " wrappers.";
-
-    wrapperInput.value = "";
+function escapeHtml(value) {
+    return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
-
-function showResults() {
-    const data =
-        JSON.parse(localStorage.getItem("wrappers")) || {};
-
-    const resultsBox = document.getElementById("results");
-
-    if (Object.keys(data).length === 0) {
-        resultsBox.innerHTML =
-            "<p>No wrapper results have been saved yet.</p>";
-        return;
-    }
-
-    let text = `
-        <h2>Results</h2>
-
-        <table class="results-table">
-            <tr>
-                <th>Name</th>
-                <th>Wrappers Collected</th>
-            </tr>
-    `;
-
-    let total = 0;
-
-    for (const person in data) {
-        let displayName;
-        let amount;
-
-        if (typeof data[person] === "number") {
-            displayName = person;
-            amount = data[person];
-        } else {
-            displayName = data[person].displayName;
-            amount = Number(data[person].total);
-        }
-
-        text += `
-            <tr>
-                <td>${displayName}</td>
-                <td>${amount}</td>
-            </tr>
-        `;
-
-        total += amount;
-    }
-
-    text += `
-        </table>
-
-        <p class="grand-total">
-            Total wrappers collected: ${total}
-        </p>
-    `;
-
-    resultsBox.innerHTML = text;
+async function saveData() {
+ const nameInput=document.getElementById("name");
+ const itemInput=document.getElementById("wrappers");
+ const message=document.getElementById("message");
+ const btn=document.querySelector(".form-buttons button:first-child");
+ const name=nameInput.value.trim();
+ const qty=Number(itemInput.value);
+ if(name===""){alert("Please enter your name.");return;}
+ if(!Number.isInteger(qty)||qty<1||qty>1000){alert("Please enter a whole number between 1 and 1000.");return;}
+ btn.disabled=true;btn.textContent="Saving...";
+ try {
+   const user=await signInVisitor();
+   await db.collection("cleanupLogs").add({
+      name:name,
+      normalizedName:name.toLowerCase(),
+      category:"wrapper",
+      quantity:qty,
+      userId:user.uid,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+   });
+   message.textContent=`Great job, ${name}! You added ${qty} wrappers.`;
+   nameInput.value=""; itemInput.value="";
+   await showResults();
+ } catch(e) {
+   console.error(e);
+   message.textContent="Could not save entry.";
+ } finally {
+   btn.disabled=false;btn.textContent="Submit";
+ }
+}
+async function showResults(){
+ const resultsBox=document.getElementById("results");
+ const snap=await db.collection("cleanupLogs").where("category","==","wrapper").get();
+ const people={}; let total=0;
+ snap.forEach(doc=>{const d=doc.data();const k=d.normalizedName||d.name.toLowerCase(); if(!people[k])people[k]={displayName:d.name,total:0}; people[k].total+=(Number(d.quantity)||0); total+=(Number(d.quantity)||0);});
+ if(Object.keys(people).length===0){resultsBox.innerHTML="<p>No wrapper results have been saved yet.</p>";return;}
+ let html=`<h2>Results</h2><table class="results-table"><tr><th>Name</th><th>Wrappers Collected</th></tr>`;
+ Object.values(people).sort((a,b)=>b.total-a.total).forEach(p=>{html+=`<tr><td>${escapeHtml(p.displayName)}</td><td>${p.total}</td></tr>`;});
+ html+=`</table><p class="grand-total">Total wrappers collected: ${total}</p>`;
+ resultsBox.innerHTML=html;
 }
 </script>
 
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
 </body>
 </html>
