@@ -1,0 +1,126 @@
+<label style="font-size:25px;">
+    Name:
+</label>
+
+<input
+    type="text"
+    id="personName"
+    placeholder="Enter your name"
+    style="font-size:25px; width:250px;"
+>
+
+<br><br>
+
+<label style="font-size:25px;">
+    How many wrappers did you collect today?
+</label>
+
+<input
+    type="number"
+    id="wrapperCount"
+    min="0"
+    style="font-size:25px; width:100px;"
+>
+
+<button
+    onclick="saveWrappers()"
+    style="font-size:20px; background-color:green; color:white;"
+>
+    Submit
+</button>
+
+<button
+    onclick="showResults()"
+    style="font-size:20px; background-color:blue; color:white;"
+>
+    Results
+</button>
+
+<p id="message" style="font-size:22px;"></p>
+
+<div id="results" style="font-size:22px;"></div>
+
+<script>
+function saveWrappers() {
+    let name = document.getElementById("personName").value.trim();
+    let wrappers = Number(document.getElementById("wrapperCount").value);
+
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+
+    if (wrappers < 0 || document.getElementById("wrapperCount").value === "") {
+        alert("Please enter a valid number.");
+        return;
+    }
+
+    // Get existing saved results
+    let savedResults =
+        JSON.parse(localStorage.getItem("wrapperResults")) || {};
+
+    // Make names lowercase so John and john count as the same person
+    let nameKey = name.toLowerCase();
+
+    if (savedResults[nameKey]) {
+        // Add to the person's previous total
+        savedResults[nameKey].total += wrappers;
+    } else {
+        // Save a new person
+        savedResults[nameKey] = {
+            displayName: name,
+            total: wrappers
+        };
+    }
+
+    // Save everything back into the browser
+    localStorage.setItem(
+        "wrapperResults",
+        JSON.stringify(savedResults)
+    );
+
+    document.getElementById("message").innerHTML =
+        "Great job, " + name + "! You added " +
+        wrappers + " wrappers. Your total is now " +
+        savedResults[nameKey].total + ".";
+
+    document.getElementById("wrapperCount").value = "";
+}
+
+function showResults() {
+    let savedResults =
+        JSON.parse(localStorage.getItem("wrapperResults")) || {};
+
+    let resultBox = document.getElementById("results");
+
+    if (Object.keys(savedResults).length === 0) {
+        resultBox.innerHTML = "<p>No results saved yet.</p>";
+        return;
+    }
+
+    let resultHTML = `
+        <h2>Cleanup Results</h2>
+
+        <table border="1"
+               cellpadding="10"
+               style="border-collapse:collapse; background-color:white;">
+            <tr>
+                <th>Name</th>
+                <th>Total Wrappers Collected</th>
+            </tr>
+    `;
+
+    for (let person in savedResults) {
+        resultHTML += `
+            <tr>
+                <td>${savedResults[person].displayName}</td>
+                <td>${savedResults[person].total}</td>
+            </tr>
+        `;
+    }
+
+    resultHTML += "</table>";
+
+    resultBox.innerHTML = resultHTML;
+}
+</script>

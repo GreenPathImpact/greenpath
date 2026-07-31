@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Log Wrappers | GreenPath</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+    <a href="index.html" class="nav-button">Home</a>
+
+    <nav class="top-navigation">
+        <a href="click-me.html">Log Bottles</a>
+        <a href="click-me3.html">Log Cans</a>
+    </nav>
+</header>
+
+<main class="logging-page">
+
+    <section class="logging-card">
+
+        <h1 class="page-title">Log Wrappers</h1>
+
+        <p class="page-description">
+            Enter your name and the number of wrappers you collected.
+        </p>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="wrappers">Wrappers Collected</label>
+
+            <input
+                type="number"
+                id="wrappers"
+                min="1"
+                placeholder="Enter a number"
+            >
+        </div>
+
+        <div class="form-buttons">
+            <button onclick="saveData()">Submit</button>
+
+            <button
+                class="secondary-button"
+                onclick="showResults()"
+            >
+                View Results
+            </button>
+        </div>
+
+        <p id="message" class="success-message"></p>
+
+        <div id="results" class="results-box"></div>
+
+    </section>
+
+    <section class="logging-images">
+        <img src="wrapper.png" alt="Person collecting wrappers">
+        <img src="litter5.png" alt="Litter cleanup">
+        <img src="wrapper2.png" alt="People collecting litter">
+    </section>
+
+</main>
+
+<script>
+function saveData() {
+    const nameInput = document.getElementById("name");
+    const wrapperInput = document.getElementById("wrappers");
+
+    const name = nameInput.value.trim();
+    const wrappers = Number(wrapperInput.value);
+
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+
+    if (!Number.isInteger(wrappers) || wrappers <= 0) {
+        alert("Please enter a whole number greater than zero.");
+        return;
+    }
+
+    const data =
+        JSON.parse(localStorage.getItem("wrappers")) || {};
+
+    const nameKey = name.toLowerCase();
+
+    if (data[nameKey]) {
+        if (typeof data[nameKey] === "number") {
+            data[nameKey] = {
+                displayName: name,
+                total: data[nameKey] + wrappers
+            };
+        } else {
+            data[nameKey].total += wrappers;
+        }
+    } else {
+        data[nameKey] = {
+            displayName: name,
+            total: wrappers
+        };
+    }
+
+    localStorage.setItem(
+        "wrappers",
+        JSON.stringify(data)
+    );
+
+    document.getElementById("message").textContent =
+        "Great job, " + name + "! You added " +
+        wrappers + " wrappers.";
+
+    wrapperInput.value = "";
+}
+
+function showResults() {
+    const data =
+        JSON.parse(localStorage.getItem("wrappers")) || {};
+
+    const resultsBox = document.getElementById("results");
+
+    if (Object.keys(data).length === 0) {
+        resultsBox.innerHTML =
+            "<p>No wrapper results have been saved yet.</p>";
+        return;
+    }
+
+    let text = `
+        <h2>Results</h2>
+
+        <table class="results-table">
+            <tr>
+                <th>Name</th>
+                <th>Wrappers Collected</th>
+            </tr>
+    `;
+
+    let total = 0;
+
+    for (const person in data) {
+        let displayName;
+        let amount;
+
+        if (typeof data[person] === "number") {
+            displayName = person;
+            amount = data[person];
+        } else {
+            displayName = data[person].displayName;
+            amount = Number(data[person].total);
+        }
+
+        text += `
+            <tr>
+                <td>${displayName}</td>
+                <td>${amount}</td>
+            </tr>
+        `;
+
+        total += amount;
+    }
+
+    text += `
+        </table>
+
+        <p class="grand-total">
+            Total wrappers collected: ${total}
+        </p>
+    `;
+
+    resultsBox.innerHTML = text;
+}
+</script>
+
+</body>
+</html>

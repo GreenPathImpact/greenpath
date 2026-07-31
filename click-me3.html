@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Log Cans | GreenPath</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+    <a href="index.html" class="nav-button">Home</a>
+
+    <nav class="top-navigation">
+        <a href="click-me.html">Log Bottles</a>
+        <a href="click-me2.html">Log Wrappers</a>
+    </nav>
+</header>
+
+<main class="logging-page">
+
+    <section class="logging-card">
+
+        <h1 class="page-title">Log Cans</h1>
+
+        <p class="page-description">
+            Enter your name and the number of cans you collected.
+        </p>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="cans">Cans Collected</label>
+
+            <input
+                type="number"
+                id="cans"
+                min="1"
+                placeholder="Enter a number"
+            >
+        </div>
+
+        <div class="form-buttons">
+            <button onclick="saveData()">Submit</button>
+
+            <button
+                class="secondary-button"
+                onclick="showResults()"
+            >
+                View Results
+            </button>
+        </div>
+
+        <p id="message" class="success-message"></p>
+
+        <div id="results" class="results-box"></div>
+
+    </section>
+
+    <section class="logging-images">
+        <img src="can.png" alt="Person collecting cans">
+        <img src="litter8.png" alt="Pile of recyclable cans and bottles">
+        <img src="can2.png" alt="Child recycling a can">
+    </section>
+
+</main>
+
+<script>
+function saveData() {
+    const nameInput = document.getElementById("name");
+    const canInput = document.getElementById("cans");
+
+    const name = nameInput.value.trim();
+    const cans = Number(canInput.value);
+
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+
+    if (!Number.isInteger(cans) || cans <= 0) {
+        alert("Please enter a whole number greater than zero.");
+        return;
+    }
+
+    const data =
+        JSON.parse(localStorage.getItem("cans")) || {};
+
+    const nameKey = name.toLowerCase();
+
+    if (data[nameKey]) {
+        if (typeof data[nameKey] === "number") {
+            data[nameKey] = {
+                displayName: name,
+                total: data[nameKey] + cans
+            };
+        } else {
+            data[nameKey].total += cans;
+        }
+    } else {
+        data[nameKey] = {
+            displayName: name,
+            total: cans
+        };
+    }
+
+    localStorage.setItem(
+        "cans",
+        JSON.stringify(data)
+    );
+
+    document.getElementById("message").textContent =
+        "Great job, " + name + "! You added " +
+        cans + " cans.";
+
+    canInput.value = "";
+}
+
+function showResults() {
+    const data =
+        JSON.parse(localStorage.getItem("cans")) || {};
+
+    const resultsBox = document.getElementById("results");
+
+    if (Object.keys(data).length === 0) {
+        resultsBox.innerHTML =
+            "<p>No can results have been saved yet.</p>";
+        return;
+    }
+
+    let text = `
+        <h2>Results</h2>
+
+        <table class="results-table">
+            <tr>
+                <th>Name</th>
+                <th>Cans Collected</th>
+            </tr>
+    `;
+
+    let total = 0;
+
+    for (const person in data) {
+        let displayName;
+        let amount;
+
+        if (typeof data[person] === "number") {
+            displayName = person;
+            amount = data[person];
+        } else {
+            displayName = data[person].displayName;
+            amount = Number(data[person].total);
+        }
+
+        text += `
+            <tr>
+                <td>${displayName}</td>
+                <td>${amount}</td>
+            </tr>
+        `;
+
+        total += amount;
+    }
+
+    text += `
+        </table>
+
+        <p class="grand-total">
+            Total cans collected: ${total}
+        </p>
+    `;
+
+    resultsBox.innerHTML = text;
+}
+</script>
+
+</body>
+</html>

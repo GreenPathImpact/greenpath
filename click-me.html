@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Log Bottles | GreenPath</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header">
+    <a href="index.html" class="nav-button">Home</a>
+
+    <nav class="top-navigation">
+        <a href="click-me2.html">Log Wrappers</a>
+        <a href="click-me3.html">Log Cans</a>
+    </nav>
+</header>
+
+<main class="logging-page">
+
+    <section class="logging-card">
+
+        <h1 class="page-title">Log Bottles</h1>
+
+        <p class="page-description">
+            Enter your name and the number of bottles you collected.
+        </p>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="bottles">Bottles Collected</label>
+            <input
+                type="number"
+                id="bottles"
+                min="1"
+                placeholder="Enter a number"
+            >
+        </div>
+
+        <div class="form-buttons">
+            <button onclick="saveData()">Submit</button>
+            <button class="secondary-button" onclick="showResults()">
+                View Results
+            </button>
+        </div>
+
+        <p id="message" class="success-message"></p>
+
+        <div id="results" class="results-box"></div>
+
+    </section>
+
+    <section class="logging-images">
+        <img src="bottle.png" alt="Collected bottles">
+        <img src="water2.png" alt="Plastic bottle">
+        <img src="bottle2.png" alt="Person recycling bottles">
+    </section>
+
+</main>
+
+<script>
+function saveData() {
+    const nameInput = document.getElementById("name");
+    const bottleInput = document.getElementById("bottles");
+
+    const name = nameInput.value.trim();
+    const bottles = Number(bottleInput.value);
+
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+
+    if (!Number.isInteger(bottles) || bottles <= 0) {
+        alert("Please enter a whole number greater than zero.");
+        return;
+    }
+
+    const data =
+        JSON.parse(localStorage.getItem("bottles")) || {};
+
+    const nameKey = name.toLowerCase();
+
+    if (data[nameKey]) {
+        data[nameKey].total += bottles;
+    } else {
+        data[nameKey] = {
+            displayName: name,
+            total: bottles
+        };
+    }
+
+    localStorage.setItem(
+        "bottles",
+        JSON.stringify(data)
+    );
+
+    document.getElementById("message").textContent =
+        "Great job, " + name + "! You added " +
+        bottles + " bottles.";
+
+    bottleInput.value = "";
+}
+
+function showResults() {
+    const data =
+        JSON.parse(localStorage.getItem("bottles")) || {};
+
+    const resultsBox = document.getElementById("results");
+
+    if (Object.keys(data).length === 0) {
+        resultsBox.innerHTML =
+            "<p>No bottle results have been saved yet.</p>";
+        return;
+    }
+
+    let text = `
+        <h2>Results</h2>
+
+        <table class="results-table">
+            <tr>
+                <th>Name</th>
+                <th>Bottles Collected</th>
+            </tr>
+    `;
+
+    let total = 0;
+
+    for (const person in data) {
+        text += `
+            <tr>
+                <td>${data[person].displayName}</td>
+                <td>${data[person].total}</td>
+            </tr>
+        `;
+
+        total += Number(data[person].total);
+    }
+
+    text += `
+        </table>
+
+        <p class="grand-total">
+            Total bottles collected: ${total}
+        </p>
+    `;
+
+    resultsBox.innerHTML = text;
+}
+</script>
+
+</body>
+</html>

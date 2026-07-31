@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GreenPath | Every Piece of Litter Counts</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-header home-header">
+
+    <a href="index.html" class="brand-name">
+        <span class="brand-leaf">🌿</span>
+        GreenPath
+    </a>
+
+    <nav class="top-navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="click-me.html">Log Bottles</a>
+        <a href="click-me2.html">Log Wrappers</a>
+        <a href="click-me3.html">Log Cans</a>
+    </nav>
+
+</header>
+
+<main>
+
+    <!-- Hero banner -->
+    <section class="new-hero">
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <p class="hero-label">Small actions. Big impact.</p>
+
+            <h1>GreenPath</h1>
+
+            <h2>Every piece of litter counts.</h2>
+
+            <p>
+                Help protect wildlife, waterways, and communities by recording
+                the bottles, wrappers, and cans you collect.
+            </p>
+
+            <a href="#logging-section" class="hero-button">
+                Start Logging
+            </a>
+        </div>
+
+    </section>
+
+    <!-- Why GreenPath section -->
+    <section class="why-section">
+
+        <div class="why-text">
+            <p class="section-label">Why GreenPath?</p>
+
+            <h2>A cleaner community starts with one small action.</h2>
+
+            <p>
+                Litter can travel through streets and storm drains before
+                reaching rivers, lakes, and oceans. It can also harm wildlife
+                and make public spaces less safe and beautiful.
+            </p>
+
+            <p>
+                GreenPath encourages people to take action by recording every
+                bottle, wrapper, and can they remove from the environment.
+            </p>
+
+            <strong>Collect it. Record it. Make a difference.</strong>
+        </div>
+
+        <div class="why-image">
+            <img
+                src="community-cleanup.jpg"
+                alt="Volunteers cleaning litter from a community park"
+            >
+        </div>
+
+    </section>
+
+    <!-- Existing logging choices -->
+    <section class="logging-section" id="logging-section">
+
+        <div class="section-heading">
+            <p class="section-label">Take Action</p>
+            <h2>What will you log today?</h2>
+            <p>Select an item below to record your cleanup contribution.</p>
+        </div>
+
+        <div class="action-cards">
+
+            <a href="click-me.html" class="action-card bottle-card">
+                <img src="download.png" alt="Illustration of bottles">
+
+                <div class="action-card-content">
+                    <h3>Log Bottles</h3>
+
+                    <p>
+                        Record the plastic bottles you collected.
+                    </p>
+
+                    <span class="card-button">Open Bottle Log →</span>
+                </div>
+            </a>
+
+            <a href="click-me2.html" class="action-card wrapper-card">
+                <img src="middle-photo.png" alt="Illustration of people collecting litter">
+
+                <div class="action-card-content">
+                    <h3>Log Wrappers</h3>
+
+                    <p>
+                        Record the wrappers you removed from the environment.
+                    </p>
+
+                    <span class="card-button">Open Wrapper Log →</span>
+                </div>
+            </a>
+
+            <a href="click-me3.html" class="action-card can-card">
+                <img src="trash.png" alt="Illustration of cans and recyclable materials">
+
+                <div class="action-card-content">
+                    <h3>Log Cans</h3>
+
+                    <p>
+                        Record the cans you collected for recycling.
+                    </p>
+
+                    <span class="card-button">Open Can Log →</span>
+                </div>
+            </a>
+
+        </div>
+
+    </section>
+
+<!-- Community impact dashboard -->
+<section class="impact-section">
+
+    <div class="section-heading">
+        <p class="section-label">Our Impact Together</p>
+
+        <h2>GreenPath Community Impact</h2>
+
+        <p>
+            These totals are calculated from the bottles, wrappers,
+            and cans recorded through GreenPath.
+        </p>
+    </div>
+
+    <div class="impact-grid">
+
+        <article class="impact-card">
+            <span class="impact-icon">🥤</span>
+
+            <div>
+                <p class="impact-number" id="bottleTotal">0</p>
+                <p class="impact-name">Bottles Logged</p>
+            </div>
+        </article>
+
+        <article class="impact-card">
+            <span class="impact-icon">🍫</span>
+
+            <div>
+                <p class="impact-number" id="wrapperTotal">0</p>
+                <p class="impact-name">Wrappers Logged</p>
+            </div>
+        </article>
+
+        <article class="impact-card">
+            <span class="impact-icon">🥫</span>
+
+            <div>
+                <p class="impact-number" id="canTotal">0</p>
+                <p class="impact-name">Cans Logged</p>
+            </div>
+        </article>
+
+        <article class="impact-card total-impact-card">
+            <span class="impact-icon">🌱</span>
+
+            <div>
+                <p class="impact-number" id="allItemsTotal">0</p>
+                <p class="impact-name">Total Items Collected</p>
+            </div>
+        </article>
+
+    </div>
+
+</section>
+
+<!-- Community cleanup goal -->
+<section class="goal-section">
+
+    <div class="goal-content">
+
+        <div class="goal-text">
+            <p class="section-label">Community Goal</p>
+
+            <h2>Help GreenPath reach 500 collected items</h2>
+
+            <p>
+                Every bottle, wrapper, and can moves the community closer
+                to the cleanup goal.
+            </p>
+        </div>
+
+        <div class="goal-progress-box">
+
+            <div class="goal-numbers">
+                <span id="goalCurrent">0</span>
+                <span>/ 500 items</span>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill" id="goalProgress"></div>
+            </div>
+
+            <p class="goal-percent" id="goalPercent">0% complete</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+    <!-- Real-world facts -->
+    <section class="facts-section">
+
+        <div class="section-heading">
+            <p class="section-label">Did You Know?</p>
+
+            <h2>Real facts about litter and recycling</h2>
+
+            <p>
+                Understanding the problem helps us see why every cleanup
+                contribution matters.
+            </p>
+        </div>
+
+        <div class="fact-grid">
+
+            <article class="fact-card">
+                <img
+                    src="plastic-pollution.jpg"
+                    alt="Plastic litter collected near a waterway"
+                >
+
+                <div class="fact-content">
+                    <h3>Plastic Reaches Waterways</h3>
+
+                    <p>
+                        Plastic items are the most common type of marine debris
+                        found in oceans, waterways, and the Great Lakes.
+                    </p>
+
+                    <a
+                        href="https://marinedebris.noaa.gov/what-marine-debris/plastic"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="fact-source"
+                    >
+                        Learn more from NOAA →
+                    </a>
+                </div>
+            </article>
+
+            <article class="fact-card">
+                <img
+                    src="wildlife-litter.jpg"
+                    alt="Wildlife near plastic litter"
+                >
+
+                <div class="fact-content">
+                    <h3>Litter Can Harm Wildlife</h3>
+
+                    <p>
+                        Animals may swallow plastic or become entangled in it,
+                        making it difficult for them to move, breathe, or feed.
+                    </p>
+
+                    <a
+                        href="https://www.epa.gov/plastics/impacts-plastic-pollution"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="fact-source"
+                    >
+                        Learn more from the EPA →
+                    </a>
+                </div>
+            </article>
+
+            <article class="fact-card">
+                <img
+                    src="community-cleanup.jpg"
+                    alt="Community members participating in a litter cleanup"
+                >
+
+                <div class="fact-content">
+                    <h3>Recycling Saves Resources</h3>
+
+                    <p>
+                        Recycling materials such as aluminum helps conserve
+                        energy and reduces the need to produce materials from
+                        new natural resources.
+                    </p>
+
+                    <a
+                        href="https://www.epa.gov/recycle/frequent-questions-recycling"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="fact-source"
+                    >
+                        Learn more from the EPA →
+                    </a>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- Closing call to action -->
+    <section class="closing-section">
+
+        <div>
+            <p class="section-label">Start Today</p>
+
+            <h2>Let’s keep our planet clean and green.</h2>
+
+            <p>
+                Every item you collect is one less piece of litter in the
+                environment.
+            </p>
+        </div>
+
+        <a href="click-me.html" class="closing-button">
+            Start Logging Now
+        </a>
+
+    </section>
+
+</main>
+
+<footer class="new-footer">
+
+    <div class="footer-content">
+
+        <div>
+            <h3>🌿 GreenPath</h3>
+
+            <p>
+                Small actions today can create a cleaner tomorrow.
+            </p>
+        </div>
+
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="click-me.html">Bottles</a>
+            <a href="click-me2.html">Wrappers</a>
+            <a href="click-me3.html">Cans</a>
+        </div>
+
+    </div>
+
+    <p class="copyright">
+        © 2026 GreenPath. Environmental Awareness Project.
+    </p>
+
+</footer>
+<script>
+    function calculateCategoryTotal(storageKey) {
+        const savedData = localStorage.getItem(storageKey);
+
+        if (!savedData) {
+            return 0;
+        }
+
+        try {
+            const parsedData = JSON.parse(savedData);
+            let categoryTotal = 0;
+
+            Object.values(parsedData).forEach(function (entry) {
+                if (typeof entry === "number") {
+                    categoryTotal += entry;
+                } else if (
+                    entry &&
+                    typeof entry === "object" &&
+                    typeof entry.total === "number"
+                ) {
+                    categoryTotal += entry.total;
+                }
+            });
+
+            return categoryTotal;
+        } catch (error) {
+            console.error(
+                "Unable to read saved GreenPath data:",
+                storageKey,
+                error
+            );
+
+            return 0;
+        }
+    }
+
+    function updateImpactDashboard() {
+        const bottleTotal = calculateCategoryTotal("bottles");
+        const wrapperTotal = calculateCategoryTotal("wrappers");
+        const canTotal = calculateCategoryTotal("cans");
+
+        const allItemsTotal =
+            bottleTotal +
+            wrapperTotal +
+            canTotal;
+
+        document.getElementById("bottleTotal").textContent =
+            bottleTotal.toLocaleString();
+
+        document.getElementById("wrapperTotal").textContent =
+            wrapperTotal.toLocaleString();
+
+        document.getElementById("canTotal").textContent =
+            canTotal.toLocaleString();
+
+        document.getElementById("allItemsTotal").textContent =
+            allItemsTotal.toLocaleString();
+		const communityGoal = 500;
+
+const goalPercentage = Math.min(
+    Math.round((allItemsTotal / communityGoal) * 100),
+    100
+);
+
+document.getElementById("goalCurrent").textContent =
+    allItemsTotal.toLocaleString();
+
+document.getElementById("goalProgress").style.width =
+    goalPercentage + "%";
+
+document.getElementById("goalPercent").textContent =
+    goalPercentage + "% complete";
+    }
+
+    updateImpactDashboard();
+</script>
+</body>
+</html>
