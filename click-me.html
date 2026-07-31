@@ -160,21 +160,28 @@ function showResults() {
 
     resultsBox.innerHTML = text;
 }
-</script>
 
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+</script>
 
 <script>
 signInVisitor()
-    .then((user) => {
+    .then(async (user) => {
         console.log("✅ Firebase Connected");
         console.log("User ID:", user.uid);
+
+        const testDocument = await db.collection("cleanupLogs").add({
+            name: "Firebase Test",
+            normalizedName: "firebase test",
+            category: "bottle",
+            quantity: 1,
+            userId: user.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log("✅ Test record created:", testDocument.id);
     })
     .catch((error) => {
-        console.error(error);
+        console.error("❌ Firebase test failed:", error);
     });
 </script>
 
