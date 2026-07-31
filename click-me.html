@@ -72,123 +72,172 @@
 </main>
 
 <script>
-function saveData() {
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+async function saveData() {
     const nameInput = document.getElementById("name");
     const bottleInput = document.getElementById("bottles");
+    const message = document.getElementById("message");
+    const submitButton =
+        document.querySelector(".form-buttons button:first-child");
 
     const name = nameInput.value.trim();
     const bottles = Number(bottleInput.value);
 
     if (name === "") {
         alert("Please enter your name.");
+        nameInput.focus();
         return;
     }
 
-    if (!Number.isInteger(bottles) || bottles <= 0) {
-        alert("Please enter a whole number greater than zero.");
+    if (name.length > 50) {
+        alert("Name cannot be longer than 50 characters.");
+        nameInput.focus();
         return;
     }
 
-    const data =
-        JSON.parse(localStorage.getItem("bottles")) || {};
-
-    const nameKey = name.toLowerCase();
-
-    if (data[nameKey]) {
-        data[nameKey].total += bottles;
-    } else {
-        data[nameKey] = {
-            displayName: name,
-            total: bottles
-        };
+    if (
+        !Number.isInteger(bottles) ||
+        bottles < 1 ||
+        bottles > 1000
+    ) {
+        alert("Please enter a whole number between 1 and 1000.");
+        bottleInput.focus();
+        return;
     }
 
-    localStorage.setItem(
-        "bottles",
-        JSON.stringify(data)
-    );
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving...";
+    message.textContent = "";
 
-    document.getElementById("message").textContent =
-        "Great job, " + name + "! You added " +
-        bottles + " bottles.";
+    try {
+        const user = await signInVisitor();
 
-    bottleInput.value = "";
+        await db.collection("cleanupLogs").add({
+            name: name,
+            normalizedName: name.toLowerCase(),
+            category: "bottle",
+            quantity: bottles,
+            userId: user.uid,
+            createdAt:
+                firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        message.textContent =
+            "Great job, " + name + "! You added " +
+            bottles + " bottles.";
+
+        nameInput.value = "";
+        bottleInput.value = "";
+
+        await showResults();
+    } catch (error) {
+        console.error("Bottle submission failed:", error);
+        message.textContent =
+            "We could not save your entry. Please try again.";
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+    }
 }
 
-function showResults() {
-    const data =
-        JSON.parse(localStorage.getItem("bottles")) || {};
-
+async function showResults() {
     const resultsBox = document.getElementById("results");
 
-    if (Object.keys(data).length === 0) {
-        resultsBox.innerHTML =
-            "<p>No bottle results have been saved yet.</p>";
-        return;
-    }
+    resultsBox.innerHTML =
+        "<p>Loading bottle results...</p>";
 
-    let text = `
-        <h2>Results</h2>
+    try {
+        await signInVisitor();
 
-        <table class="results-table">
-            <tr>
-                <th>Name</th>
-                <th>Bottles Collected</th>
-            </tr>
-    `;
+        const snapshot = await db
+            .collection("cleanupLogs")
+            .where("category", "==", "bottle")
+            .get();
 
-    let total = 0;
+        if (snapshot.empty) {
+            resultsBox.innerHTML =
+                "<p>No bottle results have been saved yet.</p>";
+            return;
+        }
 
-    for (const person in data) {
-        text += `
-            <tr>
-                <td>${data[person].displayName}</td>
-                <td>${data[person].total}</td>
-            </tr>
+        const people = {};
+        let total = 0;
+
+        snapshot.forEach((documentSnapshot) => {
+            const entry = documentSnapshot.data();
+            const name =
+                String(entry.name || "Anonymous").trim();
+            const nameKey =
+                String(
+                    entry.normalizedName ||
+                    name.toLowerCase()
+                );
+            const quantity = Number(entry.quantity) || 0;
+
+            if (!people[nameKey]) {
+                people[nameKey] = {
+                    displayName: name,
+                    total: 0
+                };
+            }
+
+            people[nameKey].total += quantity;
+            total += quantity;
+        });
+
+        const sortedPeople = Object.values(people)
+            .sort((first, second) =>
+                second.total - first.total
+            );
+
+        let text = `
+            <h2>Results</h2>
+
+            <table class="results-table">
+                <tr>
+                    <th>Name</th>
+                    <th>Bottles Collected</th>
+                </tr>
         `;
 
-        total += Number(data[person].total);
+        sortedPeople.forEach((person) => {
+            text += `
+                <tr>
+                    <td>${escapeHtml(person.displayName)}</td>
+                    <td>${person.total}</td>
+                </tr>
+            `;
+        });
+
+        text += `
+            </table>
+
+            <p class="grand-total">
+                Total bottles collected: ${total}
+            </p>
+        `;
+
+        resultsBox.innerHTML = text;
+    } catch (error) {
+        console.error("Could not load bottle results:", error);
+        resultsBox.innerHTML =
+            "<p>Unable to load results. Please try again.</p>";
     }
-
-    text += `
-        </table>
-
-        <p class="grand-total">
-            Total bottles collected: ${total}
-        </p>
-    `;
-
-    resultsBox.innerHTML = text;
 }
-
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
 <script src="./firebase-config.js"></script>
-
-<script>
-signInVisitor()
-    .then(async (user) => {
-        console.log("✅ Firebase Connected");
-        console.log("User ID:", user.uid);
-
-        const testDocument = await db.collection("cleanupLogs").add({
-            name: "Firebase Test",
-            normalizedName: "firebase test",
-            category: "bottle",
-            quantity: 1,
-            userId: user.uid,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        console.log("✅ Test record created:", testDocument.id);
-    })
-    .catch((error) => {
-        console.error("❌ Firebase test failed:", error);
-    });
-</script>
 
 </body>
 </html>
