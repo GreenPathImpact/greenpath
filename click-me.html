@@ -162,5 +162,21 @@ function showResults() {
 }
 </script>
 
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+signInVisitor()
+    .then((user) => {
+        console.log("✅ Firebase Connected");
+        console.log("User ID:", user.uid);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
+</script>
+
 </body>
 </html>
